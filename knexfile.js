@@ -34,6 +34,9 @@ export default {
       directory: './src/migrations',
       tableName: 'knex_migrations'
     },
+    seeds: {
+      directory: './src/seeds'
+    },
     pool: {
       min: 2,
       max: 10
