@@ -21,8 +21,11 @@ router.put('/articles/:id', ArticlesController.update);
 router.delete('/articles/:id', ArticlesController.destroy);
 
 // ==================== LEGACY ROUTES (Compatibilidad) ====================
-// GET /api/inventory - Mantener compatibilidad con frontend actual
+// Rutas /api/inventory - Mantener compatibilidad con frontend actual
 router.get('/inventory', ArticlesController.index);
+router.post('/inventory', ArticlesController.store);
+router.put('/inventory/:id', ArticlesController.update);
+router.delete('/inventory/:id', ArticlesController.destroy);
 
 // POST /api/process-receipt - Procesar boleta con OCR
 router.post('/process-receipt', async (req, res) => {
