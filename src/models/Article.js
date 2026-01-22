@@ -6,7 +6,7 @@ class Article {
    */
   static async findByUser(userId) {
     const { data, error } = await supabase
-      .from('inventory')
+      .from('articles')
       .select('*')
       .eq('user_id', userId)
       .order('id', { ascending: false });
@@ -39,7 +39,7 @@ class Article {
    */
   static async create(articleData) {
     const { data, error } = await supabase
-      .from('inventory')
+      .from('articles')
       .insert([articleData])
       .select()
       .single();
@@ -53,7 +53,7 @@ class Article {
    */
   static async createMany(articles) {
     const { data, error } = await supabase
-      .from('inventory')
+      .from('articles')
       .insert(articles)
       .select();
 
@@ -66,7 +66,7 @@ class Article {
    */
   static async findById(id) {
     const { data, error } = await supabase
-      .from('inventory')
+      .from('articles')
       .select('*')
       .eq('id', id)
       .single();
@@ -80,7 +80,7 @@ class Article {
    */
   static async update(id, updates) {
     const { data, error } = await supabase
-      .from('inventory')
+      .from('articles')
       .update(updates)
       .eq('id', id)
       .select()
@@ -95,7 +95,7 @@ class Article {
    */
   static async delete(id) {
     const { error } = await supabase
-      .from('inventory')
+      .from('articles')
       .delete()
       .eq('id', id);
 
@@ -108,7 +108,7 @@ class Article {
    */
   static async findByCategory(userId, category) {
     const { data, error } = await supabase
-      .from('inventory')
+      .from('articles')
       .select('*')
       .eq('user_id', userId)
       .eq('category', category)
@@ -123,7 +123,7 @@ class Article {
    */
   static async findCritical(userId, daysThreshold = 3) {
     const { data, error } = await supabase
-      .from('inventory')
+      .from('articles')
       .select('*')
       .eq('user_id', userId)
       .order('expiry_date', { ascending: true });
