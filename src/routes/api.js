@@ -2,6 +2,7 @@ import express from 'express';
 import AuthController from '../controllers/AuthController.js';
 import ArticlesController from '../controllers/ArticlesController.js';
 import RecipeController from '../controllers/recipeController.js';
+import StatisticsController from '../controllers/statisticsController.js';
 import ReceiptService from '../services/receiptService.js';
 import Article from '../models/Article.js';
 
@@ -19,6 +20,10 @@ router.get('/articles/:id', ArticlesController.show);
 router.post('/articles', ArticlesController.store);
 router.put('/articles/:id', ArticlesController.update);
 router.delete('/articles/:id', ArticlesController.destroy);
+
+// ==================== STATISTICS ROUTES ====================
+router.get('/statistics', StatisticsController.getStats);
+router.post('/statistics/consumption', StatisticsController.recordConsumption);
 
 // ==================== LEGACY ROUTES (Compatibilidad) ====================
 // Rutas /api/inventory - Mantener compatibilidad con frontend actual
