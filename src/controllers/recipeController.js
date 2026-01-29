@@ -62,12 +62,30 @@ class RecipeController {
 
       let text = completion.choices[0]?.message?.content || "";
       
-      // Limpieza por si la IA pone ```json
-      text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+      console.log("📝 Respuesta de Groq:", text.substring(0, 200) + "...");
+      
+      // Limpieza agresiva del JSON
+      text = text.trim();
+      
+      // Remover markdown
+      text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+      
+      // Buscar el primer { y el último }
+      const firstBrace = text.indexOf('{');
+      const lastBrace = text.lastIndexOf('}');
+      
+      if (firstBrace !== -1 && lastBrace !== -1) {
+        text = text.substring(firstBrace, lastBrace + 1);
+      }
 
       const result = JSON.parse(text);
       
-      console.log("✅ ¡3 RECETAS GENERADAS CON GROQ!");
+      if (!result.recipes || !Array.isArray(result.recipes)) {
+        throw new Error("Formato de respuesta inválido");
+      }
+      
+      console.log("✅ ¡RECETAS GENERADAS CON GROQ!");
+      console.log(`📋 ${result.recipes.length} recetas creadas`);
       
       res.json({
         success: true,
@@ -76,37 +94,32 @@ class RecipeController {
 
     } catch (error) {
       console.error("❌ Error con Groq:", error.message);
+      console.error("Stack:", error.stack);
       
-      // Respuesta de emergencia con 3 recetas básicas
-      const ingredientsList = Array.isArray(req.body.ingredients) ? req.body.ingredients[0] : req.body.ingredients;
+      // Respuesta de emergencia
+      const { count = 3, ingredients } = req.body;
+      const ingredientsList = Array.isArray(ingredients) ? ingredients[0] : ingredients;
+      
+      const fallbackRecipes = Array.from({ length: count }, (_, i) => {
+        const types = [
+          { title: `Salteado de ${ingredientsList}`, difficulty: "Fácil", time: "15 min" },
+          { title: `${ingredientsList} al horno`, difficulty: "Media", time: "30 min" },
+          { title: `Ensalada con ${ingredientsList}`, difficulty: "Fácil", time: "10 min" }
+        ];
+        const type = types[i % 3];
+        return {
+          title: type.title,
+          difficulty: type.difficulty,
+          time: type.time,
+          servings: 2,
+          ingredients: [ingredientsList, "Sal", "Aceite", "Especias"],
+          instructions: ["Preparar ingredientes", "Cocinar según preferencia", "Servir caliente"]
+        };
+      });
+      
       res.json({
         success: true,
-        data: [
-          {
-            title: `Salteado de ${ingredientsList}`,
-            difficulty: "Fácil",
-            time: "15 min",
-            servings: 2,
-            ingredients: [ingredientsList, "Sal", "Aceite", "Ajo"],
-            instructions: ["Calentar aceite", "Saltear el ingrediente", "Servir caliente"]
-          },
-          {
-            title: `${ingredientsList} al horno`,
-            difficulty: "Media",
-            time: "30 min",
-            servings: 3,
-            ingredients: [ingredientsList, "Especias", "Aceite de oliva"],
-            instructions: ["Precalentar horno a 180°C", "Hornear 25 min", "Servir"]
-          },
-          {
-            title: `Ensalada con ${ingredientsList}`,
-            difficulty: "Fácil",
-            time: "10 min",
-            servings: 2,
-            ingredients: [ingredientsList, "Lechuga", "Tomate", "Limón"],
-            instructions: ["Mezclar ingredientes", "Aliñar con limón", "Servir frío"]
-          }
-        ]
+        data: fallbackRecipes
       });
     }
   }
