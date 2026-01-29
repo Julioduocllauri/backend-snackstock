@@ -7,7 +7,7 @@ class RecipeController {
    */
   static async generate(req, res) {
     try {
-      const { ingredients } = req.body; // Ahora acepta array
+      const { ingredients, count = 3 } = req.body; // count = cuántas recetas generar (default 3)
       const apiKey = process.env.GROQ_API_KEY;
 
       if (!apiKey) {
@@ -26,7 +26,7 @@ class RecipeController {
       }
 
       const ingredientsList = Array.isArray(ingredients) ? ingredients.join(', ') : ingredients;
-      console.log(`👨‍🍳 Generando 3 recetas con Groq (Llama 3): ${ingredientsList}...`);
+      console.log(`👨‍🍳 Generando ${count} receta(s) con Groq (Llama 3): ${ingredientsList}...`);
 
       const groq = new Groq({ apiKey: apiKey });
 
@@ -38,36 +38,20 @@ class RecipeController {
           },
           {
             role: "user",
-            content: `Crea 3 recetas diferentes y creativas usando estos ingredientes: ${ingredientsList}.
-                      Cada receta debe ser única (desayuno, almuerzo, cena o postre).
+            content: `Crea ${count} receta(s) diferente(s) y creativa(s) usando estos ingredientes: ${ingredientsList}.
+                      ${count > 1 ? 'Cada receta debe ser única (desayuno, almuerzo, cena o postre).' : ''}
                       
                       FORMATO JSON OBLIGATORIO (sin \`\`\`json, sin explicaciones):
                       {
                         "recipes": [
-                          {
-                            "title": "Nombre del Plato 1",
+                          ${Array.from({length: count}, (_, i) => `{
+                            "title": "Nombre del Plato ${i + 1}",
                             "difficulty": "Fácil",
                             "time": "20 min",
                             "servings": 2,
-                            "ingredients": ["Ingrediente 1", "Ingrediente 2", "Ingrediente 3"],
-                            "instructions": ["Paso 1", "Paso 2", "Paso 3"]
-                          },
-                          {
-                            "title": "Nombre del Plato 2",
-                            "difficulty": "Media",
-                            "time": "30 min",
-                            "servings": 3,
                             "ingredients": ["Ingrediente 1", "Ingrediente 2"],
                             "instructions": ["Paso 1", "Paso 2"]
-                          },
-                          {
-                            "title": "Nombre del Plato 3",
-                            "difficulty": "Fácil",
-                            "time": "15 min",
-                            "servings": 2,
-                            "ingredients": ["Ingrediente 1", "Ingrediente 2"],
-                            "instructions": ["Paso 1", "Paso 2"]
-                          }
+                          }`).join(',\n                          ')}
                         ]
                       }`
           }
