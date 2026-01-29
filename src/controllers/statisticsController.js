@@ -139,7 +139,7 @@ class StatisticsController {
           category: p.category,
           times_wasted: parseInt(p.times_wasted)
         })),
-        recommendations: this.generateRecommendations(topConsumed, wastedProducts, wasteRate)
+        recommendations: StatisticsController.generateRecommendations(topConsumed, wastedProducts, wasteRate)
       };
 
       res.json({ success: true, data: stats });
