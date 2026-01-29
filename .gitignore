@@ -1,2 +1,7 @@
 .env
 node_modules
+
+# Archivos de prueba/debugging
+check_*.js
+test_*.js
+test_*.html
