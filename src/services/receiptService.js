@@ -29,13 +29,23 @@ class ReceiptService {
                       Ignora: Propina, Total, RUT, Direcciones, Mesas, Personas.
                       Arregla nombres mal escritos (ej: "L3che" -> "Leche").
                       
+                      IMPORTANTE: Para cada producto, detecta automáticamente cuántos días durará según su tipo:
+                      - Lácteos (leche, yogurt, queso fresco): 5-7 días
+                      - Frutas/verduras frescas: 3-5 días
+                      - Carnes frescas: 2-3 días
+                      - Productos envasados: 30+ días
+                      - Congelados: 90+ días
+                      - Productos secos (arroz, pasta): 365+ días
+                      
                       TEXTO OCR:
                       "${rawText}"
 
                       FORMATO RESPUESTA (Solo JSON Array válido):
                       [
-                        {"name": "Nombre Producto", "quantity": 1, "days_left": 7, "category": "Despensa"}
-                      ]`
+                        {"name": "Nombre Producto", "quantity": 1, "days_left": <número calculado>, "category": "Lácteos"}
+                      ]
+                      
+                      Las categorías válidas son: Lácteos, Frutas, Verduras, Carnes, Despensa, Congelados, Bebidas`
           }
         ],
         model: "llama-3.3-70b-versatile",
