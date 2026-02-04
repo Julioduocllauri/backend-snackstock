@@ -10,7 +10,9 @@ class User {
         email: userData.email,
         password: userData.password, // En producción: hashear con bcrypt
         name: userData.name,
-        created_at: new Date()
+        created_at: new Date(),
+        onboarding_completed: false,
+        is_first_login: true
       })
       .returning('*');
 
