@@ -34,35 +34,51 @@ class RecipeController {
         messages: [
           {
             role: "system",
-            content: "Eres un chef experto y creativo que escribe recetas detalladas y fáciles de seguir. Tus instrucciones son claras, específicas y motivadoras. Responde SOLO con JSON válido sin markdown ni explicaciones adicionales."
+            content: "Eres un chef experto y creativo que escribe recetas detalladas y fáciles de seguir. Tus instrucciones son claras, específicas y motivadoras. Cada paso debe ser CORTO (máximo 2 líneas) y enfocarse en UNA SOLA acción. Responde SOLO con JSON válido sin markdown ni explicaciones adicionales."
           },
           {
             role: "user",
             content: `Crea ${count} receta(s) diferente(s) y creativa(s) usando principalmente estos ingredientes: ${ingredientsList}.
                       ${count > 1 ? 'Cada receta debe ser única y variada (desayuno, almuerzo, cena o postre).' : ''}
                       
-                      IMPORTANTE:
-                      - Las instrucciones deben ser DETALLADAS y ESPECÍFICAS (mínimo 5-8 pasos)
-                      - Incluye temperaturas, tiempos de cocción exactos, y técnicas culinarias
-                      - Explica el "por qué" de cada paso cuando sea relevante
-                      - Usa lenguaje motivador y descriptivo
-                      - Los ingredientes deben incluir cantidades específicas (ej: "2 huevos", "200g de harina")
-                      - Añade consejos y trucos cuando sea apropiado
+                      CRÍTICO - REGLAS PARA LOS PASOS:
+                      - Cada paso debe ser CORTO (máximo 2 líneas, idealmente 1)
+                      - UN paso = UNA acción específica
+                      - Divide acciones complejas en varios pasos simples
+                      - Usa verbos de acción al inicio de cada paso
+                      - Mínimo 8-12 pasos por receta para que sea fácil de seguir
+                      
+                      EJEMPLO DE PASOS BUENOS:
+                      ✅ "Precalienta el horno a 180°C."
+                      ✅ "Bate los 2 huevos en un bowl durante 2 minutos hasta que estén espumosos."
+                      ✅ "Agrega 200g de harina tamizada poco a poco mientras mezclas."
+                      ✅ "Engrasa un molde de 20cm con mantequilla."
+                      
+                      EJEMPLO DE PASOS MALOS (NO HACER):
+                      ❌ "Precalienta el horno a 180°C. Bate los huevos con el azúcar durante 5 minutos hasta que estén esponjosos y luego agrega la harina poco a poco mientras sigues batiendo..."
+                      
+                      INGREDIENTES:
+                      - Los ingredientes deben incluir cantidades EXACTAS (ej: "2 huevos", "200g de harina", "1 cucharadita de sal")
+                      - Usa medidas estándar y claras
                       
                       FORMATO JSON OBLIGATORIO (sin \`\`\`json, sin explicaciones):
                       {
                         "recipes": [
                           ${Array.from({length: count}, (_, i) => `{
-                            "title": "Nombre Creativo del Plato ${i + 1}",
+                            "title": "Nombre Creativo y Apetitoso del Plato ${i + 1}",
                             "difficulty": "Fácil/Media/Difícil",
                             "time": "XX min",
                             "servings": 2,
-                            "ingredients": ["Cantidad + Ingrediente 1", "Cantidad + Ingrediente 2", "etc"],
+                            "ingredients": [
+                              "Cantidad exacta + Ingrediente 1",
+                              "Cantidad exacta + Ingrediente 2",
+                              "Cantidad exacta + Ingrediente 3"
+                            ],
                             "instructions": [
-                              "Paso 1 con detalles específicos sobre temperatura/tiempo/técnica",
-                              "Paso 2 explicando el proceso claramente",
-                              "Paso 3 con consejos adicionales",
-                              "etc (5-8 pasos mínimo)"
+                              "Paso 1: Una acción simple y específica (máx 2 líneas)",
+                              "Paso 2: Otra acción simple y específica",
+                              "Paso 3: Siguiente acción simple",
+                              "... (8-12 pasos totales)"
                             ]
                           }`).join(',\n                          ')}
                         ]
