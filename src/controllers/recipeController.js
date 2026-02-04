@@ -34,23 +34,36 @@ class RecipeController {
         messages: [
           {
             role: "system",
-            content: "Eres un chef experto. Responde SOLO con JSON válido sin markdown ni explicaciones adicionales."
+            content: "Eres un chef experto y creativo que escribe recetas detalladas y fáciles de seguir. Tus instrucciones son claras, específicas y motivadoras. Responde SOLO con JSON válido sin markdown ni explicaciones adicionales."
           },
           {
             role: "user",
-            content: `Crea ${count} receta(s) diferente(s) y creativa(s) usando estos ingredientes: ${ingredientsList}.
-                      ${count > 1 ? 'Cada receta debe ser única (desayuno, almuerzo, cena o postre).' : ''}
+            content: `Crea ${count} receta(s) diferente(s) y creativa(s) usando principalmente estos ingredientes: ${ingredientsList}.
+                      ${count > 1 ? 'Cada receta debe ser única y variada (desayuno, almuerzo, cena o postre).' : ''}
+                      
+                      IMPORTANTE:
+                      - Las instrucciones deben ser DETALLADAS y ESPECÍFICAS (mínimo 5-8 pasos)
+                      - Incluye temperaturas, tiempos de cocción exactos, y técnicas culinarias
+                      - Explica el "por qué" de cada paso cuando sea relevante
+                      - Usa lenguaje motivador y descriptivo
+                      - Los ingredientes deben incluir cantidades específicas (ej: "2 huevos", "200g de harina")
+                      - Añade consejos y trucos cuando sea apropiado
                       
                       FORMATO JSON OBLIGATORIO (sin \`\`\`json, sin explicaciones):
                       {
                         "recipes": [
                           ${Array.from({length: count}, (_, i) => `{
-                            "title": "Nombre del Plato ${i + 1}",
-                            "difficulty": "Fácil",
-                            "time": "20 min",
+                            "title": "Nombre Creativo del Plato ${i + 1}",
+                            "difficulty": "Fácil/Media/Difícil",
+                            "time": "XX min",
                             "servings": 2,
-                            "ingredients": ["Ingrediente 1", "Ingrediente 2"],
-                            "instructions": ["Paso 1", "Paso 2"]
+                            "ingredients": ["Cantidad + Ingrediente 1", "Cantidad + Ingrediente 2", "etc"],
+                            "instructions": [
+                              "Paso 1 con detalles específicos sobre temperatura/tiempo/técnica",
+                              "Paso 2 explicando el proceso claramente",
+                              "Paso 3 con consejos adicionales",
+                              "etc (5-8 pasos mínimo)"
+                            ]
                           }`).join(',\n                          ')}
                         ]
                       }`
