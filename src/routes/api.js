@@ -12,6 +12,7 @@ const router = express.Router();
 router.post('/auth/register', AuthController.register);
 router.post('/auth/login', AuthController.login);
 router.get('/auth/profile/:userId', AuthController.getProfile);
+router.post('/auth/complete-onboarding/:userId', AuthController.completeOnboarding);
 
 // ==================== ARTICLES ROUTES ====================
 router.get('/articles', ArticlesController.index);
