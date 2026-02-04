@@ -76,13 +76,29 @@ class AuthController {
         });
       }
 
+      // Actualizar información de login
+      const updates = { last_login: new Date() };
+      
+      // Si es el primer login, marcarlo
+      if (user.is_first_login) {
+        updates.first_login = new Date();
+        updates.is_first_login = false;
+      }
+      
+      await User.update(user.id, updates);
+      
+      // Actualizar objeto user con los nuevos valores
+      user.is_first_login = updates.is_first_login !== undefined ? updates.is_first_login : user.is_first_login;
+      user.onboarding_completed = user.onboarding_completed || false;
+
       // No enviar password en la respuesta
       delete user.password;
 
       res.json({
         success: true,
         data: user,
-        message: 'Login exitoso'
+        message: 'Login exitoso',
+        showOnboarding: !user.onboarding_completed
       });
     } catch (error) {
       console.error('Error en login:', error);
@@ -116,6 +132,36 @@ class AuthController {
       });
     } catch (error) {
       console.error('Error obteniendo perfil:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+  }
+
+  /**
+   * Completar onboarding del usuario
+   */
+  static async completeOnboarding(req, res) {
+    try {
+      const { userId } = req.params;
+
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ 
+          success: false, 
+          error: 'Usuario no encontrado' 
+        });
+      }
+
+      await User.update(userId, { onboarding_completed: true });
+
+      res.json({
+        success: true,
+        message: 'Onboarding completado exitosamente'
+      });
+    } catch (error) {
+      console.error('Error completando onboarding:', error);
       res.status(500).json({ 
         success: false, 
         error: error.message 
