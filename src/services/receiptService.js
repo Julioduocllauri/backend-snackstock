@@ -24,12 +24,15 @@ class ReceiptService {
             content: `Eres un experto en OCR y análisis de boletas de supermercado. Tu especialidad es extraer productos alimenticios de textos OCR imperfectos.
 
 REGLAS ESTRICTAS:
-1. SOLO extraer alimentos y bebidas
-2. Ignorar completamente: totales, subtotales, RUT, direcciones, fechas, números de boleta, propinas, descuentos, impuestos
-3. Corregir errores comunes de OCR (ej: "L3che" → "Leche", "Y0gurt" → "Yogurt")
-4. Normalizar nombres a español estándar
-5. Eliminar códigos de producto y números al final
-6. Si un nombre tiene precio o cantidad, separar solo el nombre del producto`
+1. SOLO extraer alimentos y bebidas comestibles
+2. NUNCA incluir productos de higiene personal (champú, acondicionador, jabón, pasta dental, desodorante, etc.)
+3. NUNCA incluir productos de limpieza (detergente, cloro, desinfectante, limpiador, etc.)
+4. NUNCA incluir productos de hogar (papel higiénico, servilletas, bolsas, etc.)
+5. Ignorar completamente: totales, subtotales, RUT, direcciones, fechas, números de boleta, propinas, descuentos, impuestos
+6. Corregir errores comunes de OCR (ej: "L3che" → "Leche", "Y0gurt" → "Yogurt")
+7. Normalizar nombres a español estándar
+8. Eliminar códigos de producto y números al final
+9. Si un nombre tiene precio o cantidad, separar solo el nombre del producto`
           },
           {
             role: "user",
@@ -100,10 +103,30 @@ Categorías válidas: Lácteos, Frutas, Verduras, Carnes, Despensa, Congelados, 
 
       // Filtro de seguridad extra (JavaScript)
       const forbiddenWords = [
+        // Metadatos de boleta
         "BOLETA", "RUT", "TOTAL", "SUBTOTAL", "MESA", "CAJA", "LOCAL", 
         "SANTIAGO", "VITACURA", "TICKET", "PROPINA", "FECHA", "HORA", 
         "CLIENTE", "FISCAL", "COMENTARIO", "IVA", "NETO", "DESCUENTO",
-        "VUELTO", "EFECTIVO", "TARJETA", "DEBITO", "CREDITO", "NUMERO"
+        "VUELTO", "EFECTIVO", "TARJETA", "DEBITO", "CREDITO", "NUMERO",
+        
+        // Productos de higiene personal
+        "CHAMPU", "SHAMPOO", "ACONDICIONADOR", "JABON", "PASTA DENTAL",
+        "CEPILLO", "DESODORANTE", "PERFUME", "COLONIA", "CREMA", "LOCION",
+        "GEL", "ESPUMA", "AFEITADORA", "RASTRILLO", "TOALLA", "PEINETA",
+        "CEPILLO DENTAL", "HILO DENTAL", "ENJUAGUE BUCAL", "TALCO",
+        "PROTECTOR SOLAR", "BLOQUEADOR", "MAQUILLAJE", "LABIAL", "RIMEL",
+        "ESMALTE", "ACETONA", "ALGODON", "COTONITO", "PAÑUELO",
+        
+        // Productos de limpieza
+        "DETERGENTE", "CLORO", "LAVANDINA", "DESINFECTANTE", "LIMPIADOR",
+        "LIMPIAVIDRIOS", "LUSTRAMUEBLES", "CERA", "ESCOBA", "TRAPEADOR",
+        "ESPONJA", "PANO", "GUANTES", "BOLSA BASURA", "INSECTICIDA",
+        "RAID", "BAYGON", "AMBIENTADOR", "AROMATIZANTE", "SUAVIZANTE",
+        
+        // Productos de hogar
+        "PAPEL HIGIENICO", "CONFORT", "ELITE", "SERVILLETA", "TOALLA PAPEL",
+        "ALUMINIO", "PLASTICO", "FILM", "BOLSA", "FOSFOROS", "ENCENDEDOR",
+        "VELA", "PILA", "BATERIA", "AMPOLLETA", "FOCO", "CABLE"
       ];
       
       const filteredItems = items.filter(item => {
@@ -111,7 +134,10 @@ Categorías válidas: Lácteos, Frutas, Verduras, Carnes, Despensa, Congelados, 
         // Filtros de validación
         if (item.name.length < 3) return false;
         if (/^[0-9\$\.,\-]+$/.test(item.name)) return false; // Solo números o símbolos
-        if (forbiddenWords.some(word => upperName.includes(word))) return false;
+        if (forbiddenWords.some(word => upperName.includes(word))) {
+          console.log(`❌ Producto rechazado (no alimenticio): ${item.name}`);
+          return false;
+        }
         return true;
       });
 
